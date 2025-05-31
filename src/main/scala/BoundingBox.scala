@@ -9,7 +9,6 @@ object BoundingBox {
     val lines = Source.stdin.getLines().toList
     val points = parseInput(lines)
     val boxes = findBoundingBoxes(points)
-    boxes.foreach(println)
     val nonOverlappingBoxes = findNonOverlappingBoxes(boxes)
     nonOverlappingBoxes.foreach(println)
   }

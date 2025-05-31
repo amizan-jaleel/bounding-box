@@ -2,6 +2,8 @@ package org.amizan
 
 import BoundingBoxDataClasses.{Box, Point}
 
+import scala.collection.immutable.BitSet.empty.&~
+
 object BoundingBoxHelperFunctions {
   def parseInput(lines: List[String]): List[Point] = {
     val matrix: Array[Array[Boolean]] =
@@ -54,11 +56,14 @@ object BoundingBoxHelperFunctions {
     ): List[Box] = remainingBoxes match {
       case Nil => retAcc
       case box :: rest =>
-        val overlaps = rest.exists(_.overlaps(box))
-        if(overlaps)
-          helper(rest, retAcc)
-        else
+        val boxesThatOverlapWithThisOne = rest.filter(_.overlaps(box))
+        if(boxesThatOverlapWithThisOne.isEmpty) {
           helper(rest, box :: retAcc)
+        }
+        else {
+          val remainingBoxesToProcess = rest.toSet &~ boxesThatOverlapWithThisOne.toSet
+          helper(remainingBoxesToProcess.toList, retAcc)
+        }
     }
     helper(boxes, Nil)
   }
