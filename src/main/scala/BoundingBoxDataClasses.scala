@@ -7,8 +7,6 @@ object BoundingBoxDataClasses {
       case _ => false
     }
     override def toString: String = s"($x,$y)"
-    lazy val plusOne: Point =
-      Point(x+1, y+1)
   }
 
   final case class Box(topLeft: Point, bottomRight: Point) {
@@ -18,8 +16,6 @@ object BoundingBoxDataClasses {
       case _ => false
     }
     override def toString: String = s"$topLeft$bottomRight"
-    lazy val plusOne: Box =
-      Box(topLeft.plusOne, bottomRight.plusOne)
     lazy val topRight: Point =
       Point(topLeft.x, bottomRight.y)
     lazy val bottomLeft: Point =

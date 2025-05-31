@@ -30,7 +30,7 @@ object BoundingBoxHelperFunctions {
       j <- 0 until numCols
     } yield {
       if(matrix(i)(j))
-        Some(Point(i,j))
+        Some(Point(i+1,j+1))
       else
         None
     }
@@ -61,7 +61,7 @@ object BoundingBoxHelperFunctions {
       unvisitedPoints = points.tail.toSet,
       pointsAcc = Nil,
       boxAcc = Nil,
-    ).map(_.plusOne)
+    )
 
   private def toBool(c: Char, row: => Int, col: => Int): Boolean = c match {
     case '-' => false
