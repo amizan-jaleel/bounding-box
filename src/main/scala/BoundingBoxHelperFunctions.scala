@@ -2,8 +2,6 @@ package org.amizan
 
 import BoundingBoxDataClasses.{Box, Point}
 
-import scala.collection.immutable.BitSet.empty.&~
-
 object BoundingBoxHelperFunctions {
   def parseInput(lines: List[String]): List[Point] = {
     val matrix: Array[Array[Boolean]] =
