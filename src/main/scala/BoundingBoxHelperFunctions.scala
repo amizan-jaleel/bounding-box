@@ -38,9 +38,26 @@ object BoundingBoxHelperFunctions {
     maybePoints.flatten.toList
   }
 
+  def findNonOverlappingBoxes(boxes: List[Box]): List[Box] = {
+    @annotation.tailrec
+    def helper(
+      remainingBoxes: List[Box],
+      retAcc: List[Box],
+    ): List[Box] = remainingBoxes match {
+      case Nil => retAcc
+      case box :: rest =>
+        val overlaps = rest.exists(_.overlaps(box))
+        if(overlaps)
+          helper(rest, retAcc)
+        else
+          helper(rest, box :: retAcc)
+    }
+    helper(boxes, Nil)
+  }
+
   def findBoundingBoxes(points: List[Point]): List[Box] =
     dfs(
-      visitQueue = points.headOption.toList, // will not be None
+      visitQueue = points.headOption.toList,
       unvisitedPoints = points.tail.toSet,
       pointsAcc = Nil,
       boxAcc = Nil,
