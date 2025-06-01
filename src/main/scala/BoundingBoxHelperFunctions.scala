@@ -17,6 +17,7 @@ object BoundingBoxHelperFunctions {
   def parseInput(lines: List[String]): List[Point] = {
     val matrix: Array[Array[Boolean]] =
       lines
+        .view
         .zipWithIndex
         .map { case (line, rowNum) =>
           line.toCharArray.zipWithIndex.map { case (ch, colNum) =>
@@ -71,7 +72,7 @@ object BoundingBoxHelperFunctions {
    *
    * Runtime Complexity:
    * - In the worst case, for each box in the list, the function may compare it with all other boxes.
-   * - If there are `n` boxes, the total comparisons can approach O(n^2) in such cases.
+   * - If there are `n` boxes, the total comparisons can approach O(n2) in such cases.
    * - This can happen if you have lots of tiny boxes that all don't overlap with each other
    *
    * @param boxes A list of Box instances to evaluate for overlapping.
@@ -133,7 +134,7 @@ object BoundingBoxHelperFunctions {
    *         - The first set includes points adjacent to the given point that are also unvisited.
    *         - The second set includes the remaining unvisited points excluding the adjacent ones.
    */
-  private def findAdjacentPointsInUnvisited(
+  private[BoundingBoxHelperFunctions] def findAdjacentPointsInUnvisited(
     point: Point,
     unvisitedPoints: Set[Point],
   ): (Set[Point], Set[Point]) = {
@@ -158,7 +159,7 @@ object BoundingBoxHelperFunctions {
    *               The list must not be empty.
    * @return A Box instance representing the smallest rectangle that contains all the input points.
    */
-  private def buildBox(points: List[Point]): Box = {
+  private[BoundingBoxHelperFunctions] def buildBox(points: List[Point]): Box = {
     val xs = points.map(_.x)
     val ys = points.map(_.y)
 
