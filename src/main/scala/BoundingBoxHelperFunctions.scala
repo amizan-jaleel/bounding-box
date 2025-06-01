@@ -114,7 +114,7 @@ object BoundingBoxHelperFunctions {
    *         false for '-', true for '*'.
    * @throws IllegalArgumentException if the character is neither '-' nor '*'.
    */
-  private def toBool(c: Char, row: => Int, col: => Int): Boolean = c match {
+  private[amizan] def toBool(c: Char, row: => Int, col: => Int): Boolean = c match {
     case '-' => false
     case '*' => true
     case _ =>
@@ -134,7 +134,7 @@ object BoundingBoxHelperFunctions {
    *         - The first set includes points adjacent to the given point that are also unvisited.
    *         - The second set includes the remaining unvisited points excluding the adjacent ones.
    */
-  private[BoundingBoxHelperFunctions] def findAdjacentPointsInUnvisited(
+  private[amizan] def findAdjacentPointsInUnvisited(
     point: Point,
     unvisitedPoints: Set[Point],
   ): (Set[Point], Set[Point]) = {
@@ -159,7 +159,7 @@ object BoundingBoxHelperFunctions {
    *               The list must not be empty.
    * @return A Box instance representing the smallest rectangle that contains all the input points.
    */
-  private[BoundingBoxHelperFunctions] def buildBox(points: List[Point]): Box = {
+  private[amizan] def buildBox(points: List[Point]): Box = {
     val xs = points.map(_.x)
     val ys = points.map(_.y)
 
