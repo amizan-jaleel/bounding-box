@@ -22,6 +22,7 @@ class BoundingBoxDataClassesTest extends Specification {
     "determine if a Point is inside a Box or not" in {
       val box = Box(Point(1,1), Point(3,3))
       box.contains(Point(2,2)) must beTrue
+      box.contains(Point(3,3)) must beTrue
       box.contains(Point(4,4)) must beFalse
     }
 

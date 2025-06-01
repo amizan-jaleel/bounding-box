@@ -97,6 +97,8 @@ object BoundingBoxHelperFunctions {
     val xs = points.map(_.x)
     val ys = points.map(_.y)
 
+    // At this point, an empty list should never be passed in
+    // So it should be safe to do min/max instead of minOption/maxOption
     val topLeft = Point(xs.min, ys.min)
     val bottomRight = Point(xs.max, ys.max)
 
