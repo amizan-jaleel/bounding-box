@@ -22,10 +22,11 @@ object BoundingBoxDataClasses {
     def overlaps(other: Box): Boolean = {
       val points = topLeft :: bottomRight :: topRight :: bottomLeft :: Nil
       val otherPoints = other.topLeft :: other.bottomRight :: other.topRight :: other.bottomLeft :: Nil
+      // Return true if any of the other's corners are within this box
       points.map(other.contains).exists(identity) ||
         // We have to handle this edge case,
         // in case the one box is completely inside another one
-        otherPoints.map(contains).exists(identity)
+        otherPoints.map(this.contains).exists(identity)
     }
   }
 

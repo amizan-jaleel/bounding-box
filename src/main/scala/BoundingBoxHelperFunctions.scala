@@ -3,6 +3,17 @@ package org.amizan
 import BoundingBoxDataClasses.{Box, Point}
 
 object BoundingBoxHelperFunctions {
+  /**
+   * Parses a list of string lines to identify points represented by specific characters.
+   * Each point corresponds to an asterisk ('*') in the input. The method validates the input
+   * ensuring all rows have consistent lengths and throws an exception if the input is invalid.
+   *
+   * @param lines A list of strings representing a grid where '-' denotes empty space
+   *              and '*' denotes a point.
+   * @return A list of Point instances corresponding to the positions
+   *         of asterisks ('*') in the input grid.
+   * @throws IllegalArgumentException if the input is empty or if the rows have inconsistent lengths.
+   */
   def parseInput(lines: List[String]): List[Point] = {
     val matrix: Array[Array[Boolean]] =
       lines
@@ -38,27 +49,49 @@ object BoundingBoxHelperFunctions {
     maybePoints.flatten.toList
   }
 
+  /**
+   * Find all the bounding boxes from these points.
+   * Calls the tail recursive helper function
+   *
+   * @param points A list of points that corresponds to the asterisks in the input file
+   * @return A list of Box instances. Each Box represents the smallest rectangle that can contain
+   *         a contiguous group of points from the input list.
+   */
   def findBoundingBoxes(points: List[Point]): List[Box] =
-    dfs(
+    pointsToBoxes(
       visitQueue = points.headOption.toList,
       unvisitedPoints = points.tail.toSet,
       pointsAcc = Nil,
       boxAcc = Nil,
     )
 
+  /**
+   * Given a list of boxes, throw out any box that overlaps with any other box
+   * Use the `overlap` method on the `Box` class to test for overlap
+   *
+   * Runtime Complexity:
+   * - In the worst case, for each box in the list, the function may compare it with all other boxes.
+   * - If there are `n` boxes, the total comparisons can approach O(n^2) in such cases.
+   * - This can happen if you have lots of tiny boxes that all don't overlap with each other
+   *
+   * @param boxes A list of Box instances to evaluate for overlapping.
+   * @return A filtered down list of boxes that all don't overlap with one another
+   */
   def findNonOverlappingBoxes(boxes: List[Box]): List[Box] = {
     @annotation.tailrec
     def helper(
       remainingBoxes: List[Box],
       retAcc: List[Box],
     ): List[Box] = remainingBoxes match {
-      case Nil => retAcc
-      case box :: rest =>
+      case Nil => retAcc // Done comparing boxes, return the accumulator
+      case box :: rest => // Find all the boxes that overlap with this one
         val boxesThatOverlapWithThisOne = rest.filter(_.overlaps(box))
         if(boxesThatOverlapWithThisOne.isEmpty) {
+          // We can keep this box, it doesn't overlap with anything
           helper(rest, box :: retAcc)
         }
         else {
+          // Throw out this box and all the ones that overlap with it
           val remainingBoxesToProcess = rest.toSet &~ boxesThatOverlapWithThisOne.toSet
           helper(remainingBoxesToProcess.toList, retAcc)
         }
@@ -66,6 +99,20 @@ object BoundingBoxHelperFunctions {
     helper(boxes, Nil)
   }
 
+  /**
+   * Converts a given character into a boolean value based on specific character rules.
+   * Throws an IllegalArgumentException if the character is not valid.
+   *
+   * @param c   The input character to be converted. 
+   *            Acceptable characters: '-' (false), '*' (true).
+   * @param row The row number where the character is located; used for error reporting.
+   *            This parameter is lazily evaluated.
+   * @param col The column number where the character is located; used for error reporting.
+   *            This parameter is lazily evaluated.
+   * @return A boolean value corresponding to the input character: 
+   *         false for '-', true for '*'.
+   * @throws IllegalArgumentException if the character is neither '-' nor '*'.
+   */
   private def toBool(c: Char, row: => Int, col: => Int): Boolean = c match {
     case '-' => false
     case '*' => true
@@ -75,6 +122,17 @@ object BoundingBoxHelperFunctions {
       )
   }
 
+  /**
+   * For a given point, check up, down, left, and right
+   * If any of those are in the 'to visit' group, return those
+   * Also return the 'to visit' group without the above accounted for points
+   *
+   * @param point           Check if any of this point's neighbors should go in the box
+   * @param unvisitedPoints Points not yet assigned to a Box
+   * @return A tuple containing two sets:
+   *         - The first set includes points adjacent to the given point that are also unvisited.
+   *         - The second set includes the remaining unvisited points excluding the adjacent ones.
+   */
   private def findAdjacentPointsInUnvisited(
     point: Point,
     unvisitedPoints: Set[Point],
@@ -93,6 +151,13 @@ object BoundingBoxHelperFunctions {
     (pointsToVisit, remainingUnvisited)
   }
 
+  /**
+   * Builds a bounding box that encompasses all the points in the provided list.
+   *
+   * @param points A list of points for which the bounding box is to be created. 
+   *               The list must not be empty.
+   * @return A Box instance representing the smallest rectangle that contains all the input points.
+   */
   private def buildBox(points: List[Point]): Box = {
     val xs = points.map(_.x)
     val ys = points.map(_.y)
@@ -105,31 +170,41 @@ object BoundingBoxHelperFunctions {
     Box(topLeft, bottomRight)
   }
 
+  /***
+   * Group all contiguous points and transform them to boxes
+   *
+   * @param visitQueue contiguous points, to be put into a box
+   * @param unvisitedPoints all the points not yet in a box
+   * @param pointsAcc when done searching this island, put this into a box
+   * @param boxAcc accumulator for return
+   * @return all bounding boxes
+   */
   @annotation.tailrec
-  private def dfs(
+  private def pointsToBoxes(
     visitQueue: List[Point],
     unvisitedPoints: Set[Point],
     pointsAcc: List[Point],
     boxAcc: List[Box],
   ): List[Box] = visitQueue match {
-    case Nil =>
-      val boxes = buildBox(pointsAcc) :: boxAcc
+    case Nil => // We've exhausted a DFS of adjacent points for this box
+      val boxes = buildBox(pointsAcc) :: boxAcc // Save the box to the accumulator
       unvisitedPoints.headOption match {
-        case None => boxes
-        case Some(unvisitedPoint) =>
-          dfs(
+        case None => boxes // We've found all boxes, return the result
+        case Some(unvisitedPoint) => // There's another box to find
+          pointsToBoxes(
             visitQueue = List(unvisitedPoint),
             unvisitedPoints = unvisitedPoints - unvisitedPoint,
-            pointsAcc = Nil,
+            pointsAcc = Nil, // Fresh set of points for next box
             boxAcc = boxes,
           )
       }
-    case point :: rest =>
+    case point :: rest => // We're still searching for current box
+      // Check adjacent points and add to queue
       val (pointsToVisit, remainingUnvisited) = findAdjacentPointsInUnvisited(
         point,
         unvisitedPoints,
       )
-      dfs(
+      pointsToBoxes(
         visitQueue = rest ::: pointsToVisit.toList,
         unvisitedPoints = remainingUnvisited,
         pointsAcc = point :: pointsAcc,
