@@ -7,9 +7,9 @@ object BoundingBoxDataClasses {
 
   final case class Box(topLeft: Point, bottomRight: Point) {
     override def toString: String = s"$topLeft$bottomRight"
-    lazy val topRight: Point =
+    private lazy val topRight: Point =
       Point(topLeft.x, bottomRight.y)
-    lazy val bottomLeft: Point =
+    private lazy val bottomLeft: Point =
       Point(bottomRight.x, topLeft.y)
       
     def contains(point: Point): Boolean = {
