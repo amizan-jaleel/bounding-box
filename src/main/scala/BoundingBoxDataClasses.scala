@@ -2,7 +2,7 @@ package org.amizan
 
 object BoundingBoxDataClasses {
   /**
-   * A class representing a '*' from the input file
+   * A class representing a '*' position in the input file
    *
    * @param x the x-coordinate of the point, 1-indexed
    * @param y the y-coordinate of the point, 1-indexed

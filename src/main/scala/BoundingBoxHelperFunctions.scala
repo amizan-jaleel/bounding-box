@@ -4,8 +4,8 @@ import BoundingBoxDataClasses.{Box, Point}
 
 object BoundingBoxHelperFunctions {
   /**
-   * Parses a list of string lines to identify points represented by specific characters.
-   * Each point corresponds to an asterisk ('*') in the input. The method validates the input
+   * Parse the input file into a list of `Point`.
+   * Each point corresponds to an asterisk ('*') in the input. We validate the input,
    * ensuring all rows have consistent lengths and throws an exception if the input is invalid.
    *
    * @param lines A list of strings representing a grid where '-' denotes empty space
@@ -58,13 +58,16 @@ object BoundingBoxHelperFunctions {
    * @return A list of Box instances. Each Box represents the smallest rectangle that can contain
    *         a contiguous group of points from the input list.
    */
-  def findBoundingBoxes(points: List[Point]): List[Box] =
-    pointsToBoxes(
-      visitQueue = points.headOption.toList,
-      unvisitedPoints = points.tail.toSet,
-      pointsAcc = Nil,
-      boxAcc = Nil,
-    )
+  def findBoundingBoxes(points: List[Point]): List[Box] = points match {
+    case Nil => Nil
+    case head :: tail =>
+      pointsToBoxes(
+        visitQueue = List(head),
+        unvisitedPoints = tail.toSet,
+        pointsAcc = Nil,
+        boxAcc = Nil,
+      )
+  }
 
   /**
    * Given a list of boxes, throw out any box that overlaps with any other box
